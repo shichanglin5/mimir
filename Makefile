@@ -186,6 +186,7 @@ PROTO_GOS := $(patsubst %.proto,%.pb.go,$(PROTO_DEFS))
 # Building binaries is now automated. The convention is to build a binary
 # for every directory with main.go in it.
 MAIN_GO := $(shell find . $(DONT_FIND) -type f -name 'main.go' -print)
+$(info $(MAIN_GO))
 EXES := $(foreach exeDir,$(patsubst %/main.go, %, $(MAIN_GO)),$(exeDir)/$(notdir $(exeDir)))
 EXES_RACE := $(foreach exeDir,$(patsubst %/main.go, %, $(MAIN_GO)),$(exeDir)/$(addsuffix _race, $(notdir $(exeDir))))
 GO_FILES := $(shell find . $(DONT_FIND) -name cmd -prune -o -name '*.pb.go' -prune -o -type f -name '*.go' -print)
@@ -688,3 +689,21 @@ test-packages: packages packaging/rpm/centos-systemd/$(UPTODATE) packaging/deb/d
 
 docs: doc
 	cd docs && $(MAKE) docs
+
+build-mimir:
+	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build -gcflags="all=-N -l" -o .wd/docker/mimir ./cmd/mimir
+
+build-binary:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -gcflags="all=-N -l" -o .wd/docker/mimir-linux-amd64 ./cmd/mimir
+
+imageRepo?=hub.17usoft.com/lhhdz/grafana/mimir:2.11_pre
+docker-image-build: build-binary
+	cd .wd/docker && docker build --platform=linux/amd64 -t $(imageRepo) -f Dockerfile .
+
+docker-image-push: docker-image-build
+	docker push $(imageRepo)
+
+
+image-remote-debug:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -gcflags="all=-N -l" -o .wd/docker-remote-debug/mimir ./cmd/mimir
+	cd .wd/docker-remote-debug && docker build --platform linux/amd64 -t hub.17usoft.com/lhhdz/mimir:remote_debug . && docker push hub.17usoft.com/lhhdz/mimir:remote_debug

@@ -103,13 +103,16 @@ func extrapolatedRate(vals []parser.Value, args parser.Expressions, enh *EvalNod
 		firstT = samples.Floats[0].T
 		lastT = samples.Floats[numSamplesMinusOne].T
 		resultFloat = samples.Floats[numSamplesMinusOne].F - samples.Floats[0].F
+		if resultFloat < 0 && samples.Floats[numSamplesMinusOne].F != 0 {
+			resultFloat = 0
+		}
 		if !isCounter {
 			break
 		}
 		// Handle counter resets:
 		prevValue := samples.Floats[0].F
 		for _, currPoint := range samples.Floats[1:] {
-			if currPoint.F < prevValue {
+			if currPoint.F < prevValue && currPoint.F == 0 {
 				resultFloat += prevValue
 			}
 			prevValue = currPoint.F
