@@ -1,0 +1,372 @@
+kubeVersionOverride: v1.27.4
+fullnameOverride: mimir
+image:
+  repository: hub.17usoft.com/lhhdz/grafana/mimir
+  tag: 2.11_pre
+  pullPolicy: IfNotPresent
+global:
+  dnsService: kube-dns
+  dnsNamespace: kube-system
+  clusterDomain: cluster.local.
+  extraEnv: [ ]
+  extraEnvFrom:
+    - configMapRef:
+        name: mimir-extra-env
+serviceAccount:
+  create: true
+configStorageType: ConfigMap
+
+runtimeConfig:
+  distributor_limits:
+    max_ingestion_rate: 200000000
+    max_inflight_push_requests: 200000000
+    max_inflight_push_requests_bytes: 10000000000
+  ingester_limits:
+    max_tenants: 100
+    max_series: 200000000
+    max_ingestion_rate: 200000000
+    max_inflight_push_requests: 200000000
+    max_inflight_push_requests_bytes: 10000000000
+  overrides:
+    skyeye-apm:
+      # Distributor
+      request_rate: 4000
+      request_burst_size: 5000
+      ingestion_rate: 1500000
+      ingestion_burst_size: 2000000
+      accept_ha_samples: false
+      max_label_name_length: 50
+      max_label_value_length: 20
+      service_overload_status_code_on_rate_limit_enabled: false
+      max_global_series_per_user: 100000000 # 1 亿
+      max_global_series_per_metric: 100000000
+      # Query-Frontend
+      max_total_query_length: 1M # 查询最大时间跨度 end-start
+      results_cache_ttl: 7d # 缓存 1 week
+      results_cache_ttl_for_out_of_order_time_window: 10m
+      cache_unaligned_requests: true
+      align_queries_with_step: false
+      # Querier
+      max_query_parallelism: 240
+      max_fetched_series_per_query: 50000000 # 1000w
+      max_cache_freshness: 1m # ooo cache 10m 后会过期
+      max_queriers_per_tenant: 10000
+      query_ingesters_within: 365d
+    inf-es:
+      request_rate: 1
+      ingestion_rate: 1
+
+distributor:
+  replicas: 8
+  topologySpreadConstraints:
+    maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: ScheduleAnyway
+  terminationGracePeriodSeconds: 60
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 15%
+  securityContext:
+    fsGroup: ~
+    runAsGroup: ~
+    runAsNonRoot: ~
+    runAsUser: 0
+    seccompProfile: ~
+  podSecurityContext: ~
+  containerSecurityContext: ~
+  resources:
+    limits:
+      memory: ~
+    requests:
+      cpu: ~
+      memory: ~
+
+ingester:
+  replicas: 8
+  statefulSet:
+    enabled: true
+  persistentVolume:
+    enabled: true
+    storageClass: "mimir-ingester"
+    size: 800Gi
+    accessModes:
+      - ReadWriteOnce
+    enableRetentionPolicy: true
+    whenScaled: Retain
+    whenDeleted: Retain
+  readinessProbe:
+    httpGet:
+      path: /ready
+      port: http-metrics
+      scheme: HTTP
+    initialDelaySeconds: 60
+    timeoutSeconds: 3
+    periodSeconds: 10
+    successThreshold: 1
+    failureThreshold: 3
+  topologySpreadConstraints:
+    maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: ScheduleAnyway
+  zoneAwareReplication:
+    enabled: false
+  securityContext:
+    fsGroup: ~
+    runAsGroup: ~
+    runAsNonRoot: ~
+    runAsUser: 0
+    seccompProfile: ~
+  podSecurityContext: ~
+  containerSecurityContext: ~
+  resources:
+    limits:
+      memory: ~
+    requests:
+      cpu: ~
+      memory: ~
+
+overrides_exporter:
+  enabled: true
+  replicas: 1
+  securityContext:
+    fsGroup: ~
+    runAsGroup: ~
+    runAsNonRoot: ~
+    runAsUser: 0
+    seccompProfile: ~
+  podSecurityContext: ~
+  containerSecurityContext: ~
+  resources:
+    limits:
+      memory: ~
+    requests:
+      cpu: ~
+      memory: ~
+
+ruler:
+  enabled: true
+  replicas: 3
+  securityContext:
+    fsGroup: ~
+    runAsGroup: ~
+    runAsNonRoot: ~
+    runAsUser: 0
+    seccompProfile: ~
+  podSecurityContext: ~
+  containerSecurityContext: ~
+  resources:
+    limits:
+      memory: ~
+    requests:
+      cpu: ~
+      memory: ~
+
+querier:
+  replicas: 8
+  topologySpreadConstraints:
+    maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: ScheduleAnyway
+  securityContext:
+    fsGroup: ~
+    runAsGroup: ~
+    runAsNonRoot: ~
+    runAsUser: 0
+    seccompProfile: ~
+  podSecurityContext: ~
+  containerSecurityContext: ~
+  resources:
+    limits:
+      memory: ~
+    requests:
+      cpu: ~
+      memory: ~
+
+query_frontend:
+  replicas: 8
+  securityContext:
+    fsGroup: ~
+    runAsGroup: ~
+    runAsNonRoot: ~
+    runAsUser: 0
+    seccompProfile: ~
+  podSecurityContext: ~
+  containerSecurityContext: ~
+  resources:
+    limits:
+      memory: ~
+    requests:
+      cpu: ~
+      memory: ~
+
+query_scheduler:
+  enabled: true
+  replicas: 2
+  securityContext:
+    fsGroup: ~
+    runAsGroup: ~
+    runAsNonRoot: ~
+    runAsUser: 0
+    seccompProfile: ~
+  podSecurityContext: ~
+  containerSecurityContext: ~
+  resources:
+    limits:
+      memory: ~
+    requests:
+      cpu: ~
+      memory: ~
+
+store_gateway:
+  replicas: 1
+  podDisruptionBudget:
+    maxUnavailable: 1
+  persistentVolume:
+    enabled: true
+    storageClass: "mimir-store-gateway"
+    size: 300Gi
+    accessModes:
+      - ReadWriteOnce
+    enableRetentionPolicy: true
+    whenScaled: Retain
+    whenDeleted: Retain
+  topologySpreadConstraints:
+    maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: ScheduleAnyway
+  readinessProbe:
+    httpGet:
+      path: /ready
+      port: http-metrics
+    initialDelaySeconds: 60
+  strategy:
+    type: RollingUpdate
+  zoneAwareReplication:
+    enabled: false
+  securityContext:
+    fsGroup: ~
+    runAsGroup: ~
+    runAsNonRoot: ~
+    runAsUser: 0
+    seccompProfile: ~
+  podSecurityContext: ~
+  containerSecurityContext: ~
+  resources:
+    limits:
+      memory: ~
+    requests:
+      cpu: ~
+      memory: ~
+
+compactor:
+  replicas: 1
+  persistentVolume:
+    enabled: false
+  securityContext:
+    fsGroup: ~
+    runAsGroup: ~
+    runAsNonRoot: ~
+    runAsUser: 0
+    seccompProfile: ~
+  podSecurityContext: ~
+  containerSecurityContext: ~
+  resources:
+    limits:
+      memory: ~
+    requests:
+      cpu: ~
+      memory: ~
+
+chunks-cache:
+  enabled: true
+  replicas: 1
+  resources:
+    requests:
+      cpu: ~
+      memory: ~
+
+index-cache:
+  enabled: true
+  replicas: 1
+  resources:
+    requests:
+      cpu: ~
+      memory: ~
+
+metadata-cache:
+  enabled: true
+  replicas: 1
+  resources:
+    requests:
+      cpu: ~
+      memory: ~
+
+results-cache:
+  enabled: true
+  replicas: 1
+  allocatedMemory: 1024
+  resources:
+    requests:
+      cpu: ~
+      memory: ~
+
+metaMonitoring:
+  dashboards:
+    enabled: false
+    annotations:
+      k8s-sidecar-target-directory: /tmp/dashboards/Mimir Dashboards
+    labels:
+      grafana_dashboard: "1"
+  serviceMonitor:
+    enabled: true
+    clusterLabel: "null"
+    interval: 5s
+    scrapeTimeout: 3s
+    scheme: http
+  grafanaAgent:
+    enabled: true
+    imageRepo:
+    #  configReloader:
+    #    repo: quay.io
+    #    image: prometheus-operator/prometheus-config-reloader
+    #    tag: v0.47.0
+    #  grafanaAgent:
+    #    repo: docker.io
+    #    image: grafana/agent
+    #    tag: v0.29.0
+    installOperator: true
+    metrics:
+      enabled: true
+      remote:
+        url: 'http://{{ template "mimir.fullname" . }}-distributor.{{ .Release.Namespace }}.svc:{{ (((.Values.mimir).structuredConfig).server).http_listen_port | default "8080" }}'
+        headers:
+          X-Scope-OrgID: mimir
+      scrapeK8s:
+        enabled: true
+        kubeStateMetrics:
+          namespace: kube-system
+          labelSelectors:
+            app.kubernetes.io/name: kube-state-metrics
+      scrapeInterval: 15s
+    securityContext:
+      fsGroup: ~
+      runAsGroup: ~
+      runAsNonRoot: ~
+      runAsUser: 0
+      seccompProfile: ~
+    podSecurityContext: ~
+    containerSecurityContext: ~
+
+# disabled
+enterprise:
+  enabled: false
+admin-cache:
+  enabled: false
+alertmanager:
+  enabled: false
+minio:
+  enabled: false
+nginx:
+  enabled: false

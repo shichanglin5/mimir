@@ -1,0 +1,8 @@
+需要检查的点：
+- templates/z_values.yaml
+image.repository
+image.tag
+
+- templates/_config-render.tpl # mimir-config
+
+- mimir-extra-env
