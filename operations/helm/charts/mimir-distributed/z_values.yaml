@@ -28,12 +28,21 @@ runtimeConfig:
     max_inflight_push_requests: 200000000
     max_inflight_push_requests_bytes: 10000000000
   overrides:
-    skyeye-apm:
-      # Distributor
-      request_rate: 4000
-      request_burst_size: 5000
-      ingestion_rate: 1500000
-      ingestion_burst_size: 2000000
+    default:
+      request_rate: 500
+      request_burst_size: 1000
+      ingestion_rate: 700000
+      ingestion_burst_size: 1000000
+      max_global_series_per_user: 15000000
+      max_global_series_per_metric: 15000000
+      out_of_order_time_window: 10m
+      max_cache_freshness: 12m
+    skyeye-tlb:
+      request_rate: 1700
+      request_burst_size: 2200
+      ingestion_rate: 40000
+      ingestion_burst_size: 60000
+      out_of_order_time_window: 10m
       accept_ha_samples: false
       max_label_name_length: 50
       max_label_value_length: 20
@@ -52,10 +61,95 @@ runtimeConfig:
       max_cache_freshness: 1m # ooo cache 10m 后会过期
       max_queriers_per_tenant: 10000
       query_ingesters_within: 365d
+    skyeye-tlb-uat:
+      request_rate: 60
+      request_burst_size: 100
+      ingestion_rate: 1000
+      ingestion_burst_size: 2000
+      max_global_series_per_user: 150000
+      max_global_series_per_metric: 150000
+      out_of_order_time_window: 10m
+      max_cache_freshness: 12m
+    skyeye-skynet:
+      request_rate: 150
+      request_burst_size: 250
+      ingestion_rate: 4000
+      ingestion_burst_size: 6000
+      max_global_series_per_user: 300000
+      max_global_series_per_metric: 300000
+      out_of_order_time_window: 10m
+      max_cache_freshness: 12m
+    skyeye-apm:
+      request_rate: 3000
+      request_burst_size: 4500
+      ingestion_rate: 1200000
+      ingestion_burst_size: 1800000 # 180w
+      max_global_series_per_user: 80000000
+      max_global_series_per_metric: 80000000 #8kw
+      out_of_order_time_window: 10m
+      max_cache_freshness: 12m
+    skyeye-apm-uat:
+      request_rate: 1300
+      request_burst_size: 2000
+      ingestion_rate: 200000
+      ingestion_burst_size: 300000
+      max_global_series_per_user: 1500000
+      max_global_series_per_metric: 1500000
+      out_of_order_time_window: 10m
+      max_cache_freshness: 12m
+    inf-redisproxy:
+      request_rate: 40
+      request_burst_size: 60
+      ingestion_rate: 100000
+      ingestion_burst_size: 150000
+      max_global_series_per_user: 1500000
+      max_global_series_per_metric: 1500000
+      out_of_order_time_window: 10m
+      max_cache_freshness: 12m
+    inf-dbproxy:
+      request_rate: 150
+      request_burst_size: 250
+      ingestion_rate: 500000
+      ingestion_burst_size: 800000
+      max_global_series_per_user: 15000000
+      max_global_series_per_metric: 15000000
+      out_of_order_time_window: 10m
+      max_cache_freshness: 12m
+    inf-esproxy:
+      request_rate: 250
+      request_burst_size: 400
+      ingestion_rate: 750000
+      ingestion_burst_size: 1000000
+      max_global_series_per_user: 15000000
+      max_global_series_per_metric: 15000000
+      out_of_order_time_window: 10m
+      max_cache_freshness: 12m
     inf-es:
       request_rate: 1
       ingestion_rate: 1
-
+      ingestion_burst_size: 1
+      max_global_series_per_user: 1
+      max_global_series_per_metric: 1
+      out_of_order_time_window: 10m
+      max_cache_freshness: 12m
+    skyeye-gateway:
+      request_rate: 200
+      request_burst_size: 300
+      ingestion_rate: 20000
+      ingestion_burst_size: 30000
+      max_global_series_per_user: 1500000
+      max_global_series_per_metric: 1500000
+      out_of_order_time_window: 10m
+      max_cache_freshness: 12m
+    skyeye-alert:
+      request_rate: 100
+      request_burst_size: 200
+      ingestion_rate: 500
+      ingestion_burst_size: 100
+      max_global_series_per_user: 10000
+      max_global_series_per_metric: 10000
+      out_of_order_time_window: 10m
+      max_cache_freshness: 12m
 distributor:
   replicas: 8
   topologySpreadConstraints:
@@ -321,7 +415,7 @@ metaMonitoring:
       grafana_dashboard: "1"
   serviceMonitor:
     enabled: true
-    clusterLabel: "null"
+    clusterLabel: ~
     interval: 5s
     scrapeTimeout: 3s
     scheme: http

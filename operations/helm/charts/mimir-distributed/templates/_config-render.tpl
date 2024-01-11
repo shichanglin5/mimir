@@ -65,6 +65,8 @@ ingester:
     {{- if .Values.ingester.zoneAwareReplication.enabled }}
     zone_awareness_enabled: true
     {{- end }}
+    replication_factor: false
+    unregister_on_shutdown: false # 避免ring hash变化导致时序量上涨
 ingester_client:
   grpc_client_config:
     max_recv_msg_size: 104857600
@@ -144,18 +146,18 @@ store_gateway:
 # Default Limits
 limits:
   # Distributor
-  request_rate: 2000
-  request_burst_size: 3000
-  ingestion_rate: 600000 # 60w
-  ingestion_burst_size: 900000 #90w
+  request_rate: 200
+  request_burst_size: 300 # 300
+  ingestion_rate: 100000
+  ingestion_burst_size: 150000 # 150k
   accept_ha_samples: false
-  max_label_name_length: 50
-  max_label_value_length: 50
+  max_label_name_length: 100
+  max_label_value_length: 100
   service_overload_status_code_on_rate_limit_enabled: false
 
   # Ingester
-  max_global_series_per_user: 15000000 # 1.5kw
-  max_global_series_per_metric: 15000000 # 1.5KW
+  max_global_series_per_user: 1000000
+  max_global_series_per_metric: 1000000 # 100w
 
   # Query-Frontend
   max_total_query_length: 60d # 查询最大时间跨度 end-start
