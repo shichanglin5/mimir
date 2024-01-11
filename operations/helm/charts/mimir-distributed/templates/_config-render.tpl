@@ -158,7 +158,7 @@ limits:
   max_global_series_per_metric: 15000000 # 1.5KW
 
   # Query-Frontend
-  max_total_query_length: 1M # 查询最大时间跨度 end-start
+  max_total_query_length: 60d # 查询最大时间跨度 end-start
   results_cache_ttl: 7d # 缓存 1 week
   results_cache_ttl_for_out_of_order_time_window: 10m
   cache_unaligned_requests: true

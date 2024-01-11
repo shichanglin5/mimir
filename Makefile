@@ -693,7 +693,11 @@ docs: doc
 build-mimir:
 	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build -gcflags="all=-N -l" -o .wd/docker/mimir ./cmd/mimir
 
-build-binary:
+clean-binary:
+	rm -rf .wd/docker/mimir-linux-amd64
+
+build-binary: clean-binary
+	#CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o .wd/docker/mimir-linux-amd64 ./cmd/mimir
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -gcflags="all=-N -l" -o .wd/docker/mimir-linux-amd64 ./cmd/mimir
 
 imageRepo?=hub.17usoft.com/lhhdz/grafana/mimir:2.11_pre
@@ -703,7 +707,7 @@ docker-image-build: build-binary
 docker-image-push: docker-image-build
 	docker push $(imageRepo)
 
-
-image-remote-debug:
+remoteDebugTag?=2.11_pre_debug
+docker-image-push-remote-debug:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -gcflags="all=-N -l" -o .wd/docker-remote-debug/mimir ./cmd/mimir
-	cd .wd/docker-remote-debug && docker build --platform linux/amd64 -t hub.17usoft.com/lhhdz/mimir:remote_debug . && docker push hub.17usoft.com/lhhdz/mimir:remote_debug
+	cd .wd/docker-remote-debug && docker build --platform linux/amd64 -t hub.17usoft.com/lhhdz/mimir:$(remoteDebugTag) . && docker push hub.17usoft.com/lhhdz/mimir:$(remoteDebugTag)

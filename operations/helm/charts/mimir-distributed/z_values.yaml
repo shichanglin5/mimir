@@ -3,7 +3,7 @@ fullnameOverride: mimir
 image:
   repository: hub.17usoft.com/lhhdz/grafana/mimir
   tag: 2.11_pre
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 global:
   dnsService: kube-dns
   dnsNamespace: kube-system
@@ -41,7 +41,7 @@ runtimeConfig:
       max_global_series_per_user: 100000000 # 1 亿
       max_global_series_per_metric: 100000000
       # Query-Frontend
-      max_total_query_length: 1M # 查询最大时间跨度 end-start
+      max_total_query_length: 60d # 查询最大时间跨度 end-start
       results_cache_ttl: 7d # 缓存 1 week
       results_cache_ttl_for_out_of_order_time_window: 10m
       cache_unaligned_requests: true
@@ -147,7 +147,7 @@ overrides_exporter:
 
 ruler:
   enabled: true
-  replicas: 3
+  replicas: 0
   securityContext:
     fsGroup: ~
     runAsGroup: ~
@@ -220,7 +220,7 @@ query_scheduler:
       memory: ~
 
 store_gateway:
-  replicas: 1
+  replicas: 0
   podDisruptionBudget:
     maxUnavailable: 1
   persistentVolume:
@@ -261,7 +261,7 @@ store_gateway:
       memory: ~
 
 compactor:
-  replicas: 1
+  replicas: 0
   persistentVolume:
     enabled: false
   securityContext:
