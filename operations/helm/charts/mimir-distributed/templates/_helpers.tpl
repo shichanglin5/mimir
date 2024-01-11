@@ -38,7 +38,7 @@ Calculate the gateway url
 {{- if eq (include "mimir.gateway.isEnabled" . ) "true" -}}
 http://{{ include "mimir.gateway.service.name" . }}.{{ .Release.Namespace }}.svc:{{ .Values.gateway.service.port | default (include "mimir.serverHttpListenPort" . ) }}
 {{- else -}}
-http://{{ template "mimir.fullname" . }}-nginx.{{ .Release.Namespace }}.svc:{{ .Values.nginx.service.port }}
+http://{{ template "mimir.fullname" . }}-distributor.{{ .Release.Namespace }}.svc:{{ (((.Values.mimir).structuredConfig).server).http_listen_port | default "8080" }}
 {{- end -}}
 {{- end -}}
 

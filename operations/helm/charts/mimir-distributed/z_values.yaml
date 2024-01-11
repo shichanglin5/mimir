@@ -337,10 +337,12 @@ metaMonitoring:
     #    image: grafana/agent
     #    tag: v0.29.0
     installOperator: true
+    logs:
+      enabled: false
     metrics:
       enabled: true
       remote:
-        url: 'http://{{ template "mimir.fullname" . }}-distributor.{{ .Release.Namespace }}.svc:{{ (((.Values.mimir).structuredConfig).server).http_listen_port | default "8080" }}'
+        #url 自动生成 distributor /api/v1/push 地址
         headers:
           X-Scope-OrgID: mimir
       scrapeK8s:

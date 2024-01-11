@@ -22,7 +22,7 @@
   {{- end }}
   {{- end }}
   {{- $headers := .headers -}}
-  {{- if $writeBackToMimir -}}{{- $_ := set $headers "X-Scope-OrgID" "metamonitoring" -}}{{- end -}}
+  {{- if $writeBackToMimir -}}{{- $_ := set $headers "X-Scope-OrgID" "mimir" -}}{{- end -}}
   {{- with $headers }}
   headers:
     {{- toYaml . | nindent 4 }}
