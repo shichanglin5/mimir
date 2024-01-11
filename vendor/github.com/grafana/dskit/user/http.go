@@ -26,7 +26,10 @@ const (
 func ExtractOrgIDFromHTTPRequest(r *http.Request) (string, context.Context, error) {
 	orgID := r.Header.Get(OrgIDHeaderName)
 	if orgID == "" {
-		return "", r.Context(), ErrNoOrgID
+		orgID = r.URL.Query().Get(OrgIDHeaderName)
+		if orgID == "" {
+			return "", r.Context(), ErrNoOrgID
+		}
 	}
 	return orgID, InjectOrgID(r.Context(), orgID), nil
 }
