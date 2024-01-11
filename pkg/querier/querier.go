@@ -39,8 +39,8 @@ import (
 // Config contains the configuration require to create a querier
 type Config struct {
 	// QueryStoreAfter the time after which queries should also be sent to the store and not just ingesters.
-	QueryStoreAfter    time.Duration `yaml:"query_store_after" category:"advanced"`
-	MaxQueryIntoFuture time.Duration `yaml:"max_query_into_future" category:"advanced"`
+	QueryStoreAfter    model.Duration `yaml:"query_store_after" category:"advanced"`
+	MaxQueryIntoFuture time.Duration  `yaml:"max_query_into_future" category:"advanced"`
 
 	StoreGatewayClient ClientConfig `yaml:"store_gateway_client"`
 
@@ -66,7 +66,7 @@ func (cfg *Config) RegisterFlags(f *flag.FlagSet) {
 	cfg.StoreGatewayClient.RegisterFlagsWithPrefix("querier.store-gateway-client", f)
 
 	f.DurationVar(&cfg.MaxQueryIntoFuture, "querier.max-query-into-future", 10*time.Minute, "Maximum duration into the future you can query. 0 to disable.")
-	f.DurationVar(&cfg.QueryStoreAfter, queryStoreAfterFlag, 12*time.Hour, "The time after which a metric should be queried from storage and not just ingesters. 0 means all queries are sent to store. If this option is enabled, the time range of the query sent to the store-gateway will be manipulated to ensure the query end is not more recent than 'now - query-store-after'.")
+	//f.DurationVar(&cfg.QueryStoreAfter, queryStoreAfterFlag, 12*time.Hour, "The time after which a metric should be queried from storage and not just ingesters. 0 means all queries are sent to store. If this option is enabled, the time range of the query sent to the store-gateway will be manipulated to ensure the query end is not more recent than 'now - query-store-after'.")
 	f.BoolVar(&cfg.ShuffleShardingIngestersEnabled, "querier.shuffle-sharding-ingesters-enabled", true, fmt.Sprintf("Fetch in-memory series from the minimum set of required ingesters, selecting only ingesters which may have received series since -%s. If this setting is false or -%s is '0', queriers always query all ingesters (ingesters shuffle sharding on read path is disabled).", validation.QueryIngestersWithinFlag, validation.QueryIngestersWithinFlag))
 	f.BoolVar(&cfg.PreferStreamingChunksFromIngesters, "querier.prefer-streaming-chunks-from-ingesters", true, "Request ingesters stream chunks. Ingesters will only respond with a stream of chunks if the target ingester supports this, and this preference will be ignored by ingesters that do not support this.")
 	f.BoolVar(&cfg.PreferStreamingChunksFromStoreGateways, "querier.prefer-streaming-chunks-from-store-gateways", false, "Request store-gateways stream chunks. Store-gateways will only respond with a stream of chunks if the target store-gateway supports this, and this preference will be ignored by store-gateways that do not support this.")
@@ -90,7 +90,7 @@ func (cfg *Config) Validate() error {
 func (cfg *Config) ValidateLimits(limits validation.Limits) error {
 	// Ensure the config wont create a situation where no queriers are returned.
 	if limits.QueryIngestersWithin != 0 && cfg.QueryStoreAfter != 0 {
-		if cfg.QueryStoreAfter >= time.Duration(limits.QueryIngestersWithin) {
+		if time.Duration(cfg.QueryStoreAfter) >= time.Duration(limits.QueryIngestersWithin) {
 			return errBadLookbackConfigs
 		}
 	}
@@ -241,7 +241,7 @@ func (mq multiQuerier) getQueriers(ctx context.Context) (context.Context, []stor
 		queriers = append(queriers, q)
 	}
 
-	if mq.blockStore != nil && ShouldQueryBlockStore(mq.cfg.QueryStoreAfter, now, mq.minT) {
+	if mq.blockStore != nil && ShouldQueryBlockStore(time.Duration(mq.cfg.QueryStoreAfter), now, mq.minT) {
 		q, err := mq.blockStore.Querier(mq.minT, mq.maxT)
 		if err != nil {
 			return nil, nil, err
