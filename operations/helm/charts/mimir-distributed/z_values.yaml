@@ -17,109 +17,100 @@ serviceAccount:
 configStorageType: ConfigMap
 
 runtimeConfig:
+  ingester_limits:
+    max_inflight_push_requests: 200000000
+    max_series: 200000000
+    max_tenants: 50
+    max_ingestion_rate: 200000000
   distributor_limits:
     max_ingestion_rate: 200000000
     max_inflight_push_requests: 200000000
     max_inflight_push_requests_bytes: 10000000000
-  ingester_limits:
-    max_tenants: 100
-    max_series: 200000000
-    max_ingestion_rate: 200000000
-    max_inflight_push_requests: 200000000
-    max_inflight_push_requests_bytes: 10000000000
   overrides:
+    anonymous:
+      ingestion_rate: 3000000
+      ingestion_burst_size: 6000000
+      max_global_series_per_user: 200000000
+      max_global_series_per_metric: 200000000
+      out_of_order_time_window: 10m
+      max_cache_freshness: 12m
     default:
-      request_rate: 500
-      request_burst_size: 1000
-      ingestion_rate: 700000
-      ingestion_burst_size: 1000000
+      request_rate: 5000
+      request_burst_size: 5000
+      ingestion_rate: 2000000
+      ingestion_burst_size: 2000000
       max_global_series_per_user: 15000000
       max_global_series_per_metric: 15000000
       out_of_order_time_window: 10m
       max_cache_freshness: 12m
     skyeye-tlb:
-      request_rate: 1700
-      request_burst_size: 2200
-      ingestion_rate: 40000
-      ingestion_burst_size: 60000
-      out_of_order_time_window: 10m
-      accept_ha_samples: false
-      max_label_name_length: 50
-      max_label_value_length: 20
-      service_overload_status_code_on_rate_limit_enabled: false
-      max_global_series_per_user: 100000000 # 1 亿
-      max_global_series_per_metric: 100000000
-      # Query-Frontend
-      max_total_query_length: 60d # 查询最大时间跨度 end-start
-      results_cache_ttl: 7d # 缓存 1 week
-      results_cache_ttl_for_out_of_order_time_window: 10m
-      cache_unaligned_requests: true
-      align_queries_with_step: false
-      # Querier
-      max_query_parallelism: 240
-      max_fetched_series_per_query: 50000000 # 1000w
-      max_cache_freshness: 1m # ooo cache 10m 后会过期
-      max_queriers_per_tenant: 10000
-      query_ingesters_within: 365d
-    skyeye-tlb-uat:
-      request_rate: 60
-      request_burst_size: 100
-      ingestion_rate: 1000
-      ingestion_burst_size: 2000
-      max_global_series_per_user: 150000
-      max_global_series_per_metric: 150000
-      out_of_order_time_window: 10m
-      max_cache_freshness: 12m
-    skyeye-skynet:
-      request_rate: 150
-      request_burst_size: 250
-      ingestion_rate: 4000
-      ingestion_burst_size: 6000
-      max_global_series_per_user: 300000
-      max_global_series_per_metric: 300000
-      out_of_order_time_window: 10m
-      max_cache_freshness: 12m
-    skyeye-apm:
-      request_rate: 3000
-      request_burst_size: 4500
-      ingestion_rate: 1200000
-      ingestion_burst_size: 1800000 # 180w
-      max_global_series_per_user: 80000000
-      max_global_series_per_metric: 80000000 #8kw
-      out_of_order_time_window: 10m
-      max_cache_freshness: 12m
-    skyeye-apm-uat:
-      request_rate: 1300
-      request_burst_size: 2000
-      ingestion_rate: 200000
-      ingestion_burst_size: 300000
-      max_global_series_per_user: 1500000
-      max_global_series_per_metric: 1500000
-      out_of_order_time_window: 10m
-      max_cache_freshness: 12m
-    inf-redisproxy:
-      request_rate: 40
-      request_burst_size: 60
-      ingestion_rate: 100000
-      ingestion_burst_size: 150000
-      max_global_series_per_user: 1500000
-      max_global_series_per_metric: 1500000
-      out_of_order_time_window: 10m
-      max_cache_freshness: 12m
-    inf-dbproxy:
-      request_rate: 150
-      request_burst_size: 250
+      request_rate: 10000
+      request_burst_size: 14000
       ingestion_rate: 500000
       ingestion_burst_size: 800000
       max_global_series_per_user: 15000000
       max_global_series_per_metric: 15000000
       out_of_order_time_window: 10m
+      max_cache_freshness: 20m
+    skyeye-tlb-uat:
+      request_rate: 1000
+      request_burst_size: 1500
+      ingestion_rate: 50000
+      ingestion_burst_size: 500000
+      max_global_series_per_user: 500000
+      max_global_series_per_metric: 500000
+      out_of_order_time_window: 10m
+      max_cache_freshness: 12m
+    skyeye-skynet:
+      request_rate: 1000
+      request_burst_size: 1500
+      ingestion_rate: 90000
+      ingestion_burst_size: 100000
+      max_global_series_per_user: 400000
+      max_global_series_per_metric: 400000
+      out_of_order_time_window: 10m
+      max_cache_freshness: 12m
+    skyeye-apm:
+      request_rate: 60000
+      request_burst_size: 70000
+      ingestion_rate: 3000000
+      ingestion_burst_size: 4000000
+      max_global_series_per_user: 120000000
+      max_global_series_per_metric: 120000000
+      out_of_order_time_window: 10m
+      max_cache_freshness: 12m
+    skyeye-apm-uat:
+      request_rate: 10000
+      request_burst_size: 15000
+      ingestion_rate: 500000
+      ingestion_burst_size: 600000
+      max_global_series_per_user: 3000000
+      max_global_series_per_metric: 3000000
+      out_of_order_time_window: 10m
+      max_cache_freshness: 12m
+    inf-redisproxy:
+      request_rate: 500
+      request_burst_size: 500
+      ingestion_rate: 500000
+      ingestion_burst_size: 600000
+      max_global_series_per_user: 2000000
+      max_global_series_per_metric: 2000000
+      out_of_order_time_window: 10m
+      max_cache_freshness: 12m
+    inf-dbproxy:
+      request_rate: 1000
+      request_burst_size: 1500
+      ingestion_rate: 1500000
+      ingestion_burst_size: 1500000
+      max_global_series_per_user: 20000000
+      max_global_series_per_metric: 20000000
+      out_of_order_time_window: 10m
       max_cache_freshness: 12m
     inf-esproxy:
-      request_rate: 250
-      request_burst_size: 400
-      ingestion_rate: 750000
-      ingestion_burst_size: 1000000
+      request_rate: 1000
+      request_burst_size: 1500
+      ingestion_rate: 3000000
+      ingestion_burst_size: 3000000
       max_global_series_per_user: 15000000
       max_global_series_per_metric: 15000000
       out_of_order_time_window: 10m
@@ -133,12 +124,12 @@ runtimeConfig:
       out_of_order_time_window: 10m
       max_cache_freshness: 12m
     skyeye-gateway:
-      request_rate: 200
-      request_burst_size: 300
-      ingestion_rate: 20000
-      ingestion_burst_size: 30000
-      max_global_series_per_user: 1500000
-      max_global_series_per_metric: 1500000
+      request_rate: 5000
+      request_burst_size: 5000
+      ingestion_rate: 400000
+      ingestion_burst_size: 400000
+      max_global_series_per_user: 1800000
+      max_global_series_per_metric: 1800000
       out_of_order_time_window: 10m
       max_cache_freshness: 12m
     skyeye-alert:
@@ -150,6 +141,7 @@ runtimeConfig:
       max_global_series_per_metric: 10000
       out_of_order_time_window: 10m
       max_cache_freshness: 12m
+
 distributor:
   replicas: 8
   topologySpreadConstraints:
@@ -320,7 +312,7 @@ store_gateway:
   persistentVolume:
     enabled: true
     storageClass: "mimir-store-gateway"
-    size: 300Gi
+    size: 600Gi
     accessModes:
       - ReadWriteOnce
     enableRetentionPolicy: true
@@ -357,7 +349,14 @@ store_gateway:
 compactor:
   replicas: 0
   persistentVolume:
-    enabled: false
+    enabled: true
+    storageClass: "mimir-compactor"
+    size: 300Gi
+    accessModes:
+      - ReadWriteOnce
+    enableRetentionPolicy: true
+    whenScaled: Retain
+    whenDeleted: Retain
   securityContext:
     fsGroup: ~
     runAsGroup: ~
@@ -454,6 +453,13 @@ metaMonitoring:
       seccompProfile: ~
     podSecurityContext: ~
     containerSecurityContext: ~
+
+# -- Grafana Agent Operator 覆盖默认配置
+# 在一些 k8s 集群配置，可能会禁用一些默认的配置，比如 PodSecurityPolicy，这里可以覆盖默认配置
+# 导致 runtime/cgo: pthread_create failed: Operation not permitted
+grafana-agent-operator:
+  containerSecurityContext: ~
+  podSecurityContext: ~
 
 # disabled
 enterprise:

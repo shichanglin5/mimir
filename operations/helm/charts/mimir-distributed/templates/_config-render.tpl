@@ -18,7 +18,7 @@ memberlist:
 distributor:
   remote_timeout: 5s
 query_scheduler:
-  max_outstanding_requests_per_tenant: 800
+  max_outstanding_requests_per_tenant: 50
   # service_discovery_mode: ring # 在 frontend 和 querier配置 scheduler dns name
 frontend_worker: # querier 与 frontend 通信
   grpc_client_config:
@@ -65,7 +65,7 @@ ingester:
     {{- if .Values.ingester.zoneAwareReplication.enabled }}
     zone_awareness_enabled: true
     {{- end }}
-    replication_factor: false
+    replication_factor: 3
     unregister_on_shutdown: false # 避免ring hash变化导致时序量上涨
 ingester_client:
   grpc_client_config:
