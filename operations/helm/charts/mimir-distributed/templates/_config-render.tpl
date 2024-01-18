@@ -1,3 +1,4 @@
+no_auth_tenant: mimir
 usage_stats:
   enabled: false
 activity_tracker:
