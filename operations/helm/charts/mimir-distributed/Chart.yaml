@@ -22,3 +22,8 @@ dependencies:
     repository: https://grafana.github.io/helm-charts
     version: 0.10.0
     condition: rollout_operator.enabled
+  - name: grafana
+    alias: grafana
+    repository: https://grafana.github.io/helm-charts
+    version: 7.0.22
+    condition: grafana.enabled
