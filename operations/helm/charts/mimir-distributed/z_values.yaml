@@ -663,6 +663,40 @@ grafana:
       searchNamespace: mimir
       folder: /tmp/dashboards # pod 中的目录
       folderAnnotation: k8s-sidecar-target-directory # sidecar 会根据这个 annotation 来决定 dashboard 的目录
+    dashboardProviders:
+      sidecarProvider:
+        apiVersion: 1
+        providers:
+        - name: mimir
+          orgId: 1
+          folder: 'mimir'
+          type: file
+          disableDeletion: false
+          allowUiUpdates: false
+          updateIntervalSeconds: 30
+          options:
+            foldersFromFilesStructure: false
+            path: /tmp/dashboards/mimir
+        - name: kubernetes
+          orgId: 1
+          folder: 'kubernetes'
+          type: file
+          disableDeletion: false
+          allowUiUpdates: false
+          updateIntervalSeconds: 30
+          options:
+            foldersFromFilesStructure: false
+            path: /tmp/dashboards/kubernetes
+        - name: node-exporter
+          orgId: 1
+          folder: 'node-exporter'
+          type: file
+          disableDeletion: false
+          allowUiUpdates: false
+          updateIntervalSeconds: 30
+          options:
+            foldersFromFilesStructure: false
+            path: /tmp/dashboards/node-exporter
   securityContext:
     runAsUser: 0
     runAsGroup: 0
