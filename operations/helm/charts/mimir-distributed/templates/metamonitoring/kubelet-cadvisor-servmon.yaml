@@ -37,10 +37,6 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
       metricRelabelings:
-        - action: keep
-          regex: storage-{{ include "mimir.resourceName" (dict "ctx"  $) }}.*
-          sourceLabels:
-            - persistentvolumeclaim # present on kubelet_volume_stats* metrics
         - targetLabel: instance # replace so that the metrics work with the default metrics mixin
           sourceLabels:
             - node
@@ -70,11 +66,6 @@ spec:
         {{- with .relabelings }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      metricRelabelings:
-        - action: keep
-          regex: {{ include "mimir.resourceName" (dict "ctx"  $) }}.*
-          sourceLabels:
-            - pod
       scheme: https
       tlsConfig:
         caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt

@@ -17,15 +17,7 @@ metadata:
   {{- end }}
 spec:
   endpoints:
-    - port: http-metrics
-      metricRelabelings:
-        - action: keep
-          regex: "(^|.*;){{ include "mimir.resourceName" (dict "ctx"  $) }}.*"
-          sourceLabels:
-            - deployment
-            - statefulset
-            - pod
-          separator: ';'
+    - port: metrics
       {{- if kindIs "string" .clusterLabel }}
       relabelings:
         - targetLabel: cluster
