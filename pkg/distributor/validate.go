@@ -343,7 +343,7 @@ func validateLabels(m *sampleValidationMetrics, cfg labelValidationConfig, userI
 			return fmt.Errorf(labelNameTooLongMsgFormat, l.Name, mimirpb.FromLabelAdaptersToString(ls))
 		} else if len(l.Value) > maxLabelValueLength {
 			m.labelValueTooLong.WithLabelValues(userID, group).Inc()
-			return fmt.Errorf(labelValueTooLongMsgFormat, l.Value, mimirpb.FromLabelAdaptersToString(ls))
+			return fmt.Errorf(labelValueTooLongMsgFormat, fmt.Sprintf("%s, length:%d", l.Value, len(l.Value)), mimirpb.FromLabelAdaptersToString(ls))
 		} else if lastLabelName == l.Name {
 			m.duplicateLabelNames.WithLabelValues(userID, group).Inc()
 			return fmt.Errorf(duplicateLabelMsgFormat, l.Name, mimirpb.FromLabelAdaptersToString(ls))
