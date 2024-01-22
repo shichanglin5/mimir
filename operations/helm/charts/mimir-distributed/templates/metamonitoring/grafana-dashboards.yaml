@@ -20,7 +20,8 @@ metadata:
   {{- end }}
 data:
   {{ $file }}: |-
-{{ $.Files.Get $path | indent 4 }}
+{{- $fileData := $.Files.Get $path | fromJson | merge (dict "timezone" "default") | toJson | indent 4 }}
+{{ $fileData }}
 ---
 {{- end }}
 {{ end }}
