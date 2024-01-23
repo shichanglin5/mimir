@@ -33,6 +33,8 @@ runtimeConfig:
     max_inflight_push_requests_bytes: 10000000000
   overrides:
     anonymous:
+      request_rate: 100
+      request_burst_size: 200
       ingestion_rate: 3000000
       ingestion_burst_size: 6000000
       max_global_series_per_user: 200000000
@@ -40,6 +42,8 @@ runtimeConfig:
       out_of_order_time_window: 10m
       max_cache_freshness: 12m
     mimir:
+      request_rate: 1000
+      request_burst_size: 2000
       ingestion_rate: 3000000
       ingestion_burst_size: 6000000
       max_global_series_per_user: 200000000
@@ -112,19 +116,19 @@ runtimeConfig:
       out_of_order_time_window: 10m
       max_cache_freshness: 12m
     inf-dbproxy:
-      request_rate: 1000
-      request_burst_size: 1500
-      ingestion_rate: 1500000
-      ingestion_burst_size: 1500000
+      request_rate: 2000
+      request_burst_size: 3000
+      ingestion_rate: 2000000
+      ingestion_burst_size: 2500000
       max_global_series_per_user: 20000000
       max_global_series_per_metric: 20000000
       out_of_order_time_window: 10m
       max_cache_freshness: 12m
     inf-esproxy:
-      request_rate: 1000
-      request_burst_size: 1500
-      ingestion_rate: 3000000
-      ingestion_burst_size: 3000000
+      request_rate: 4000
+      request_burst_size: 5000
+      ingestion_rate: 4000000
+      ingestion_burst_size: 5000000
       max_global_series_per_user: 15000000
       max_global_series_per_metric: 15000000
       out_of_order_time_window: 10m
@@ -485,9 +489,6 @@ metaMonitoring:
           labelSelectors:
             name: kube-state-metrics
             app.kubernetes.io/name: ~
-#          namespace: lens-metrics
-#          labelSelectors:
-#            app.kubernetes.io/name: kube-state-metrics
       scrapeInterval: 15s
     securityContext:
       fsGroup: ~
@@ -512,6 +513,12 @@ nginx:
   nodeSelector:
     schedule.enabled/mimir: ''
   replicas: 1
+  securityContext:
+    fsGroup: ~
+    runAsGroup: ~
+    runAsNonRoot: ~
+    runAsUser: 0
+    seccompProfile: ~
   verboseLogging: true
   image:
     registry: docker.io
@@ -699,46 +706,55 @@ grafana:
       tag: 1.25.2
     dashboards:
       enabled: true
-      provider: ~
+      provider:
+        name: 'sidecarProvider'
+        orgId: 1
+        type: file
+        disableDeletion: false
+        allowUiUpdates: false
+        updateIntervalSeconds: 15
+        foldersFromFilesStructure: true
+        options:
+          path: /tmp/dashboards
       label: grafana_dashboard
       labelValue: "1"
       searchNamespace: mimir
       folder: /tmp/dashboards # pod 中的目录
       folderAnnotation: k8s-sidecar-target-directory # sidecar 会根据这个 annotation 来决定 dashboard 的目录
-    dashboardProviders:
-      sidecarProvider:
-        apiVersion: 1
-        providers:
-        - name: mimir
-          orgId: 1
-          folder: 'mimir'
-          type: file
-          disableDeletion: false
-          allowUiUpdates: false
-          updateIntervalSeconds: 30
-          options:
-            foldersFromFilesStructure: false
-            path: /tmp/dashboards/mimir
-        - name: kubernetes
-          orgId: 1
-          folder: 'kubernetes'
-          type: file
-          disableDeletion: false
-          allowUiUpdates: false
-          updateIntervalSeconds: 30
-          options:
-            foldersFromFilesStructure: false
-            path: /tmp/dashboards/kubernetes
-        - name: node-exporter
-          orgId: 1
-          folder: 'node-exporter'
-          type: file
-          disableDeletion: false
-          allowUiUpdates: false
-          updateIntervalSeconds: 30
-          options:
-            foldersFromFilesStructure: false
-            path: /tmp/dashboards/node-exporter
+#  dashboardProviders:
+#    sidecarProvider:
+#      apiVersion: 1
+#      providers:
+#      - name: mimir
+#        orgId: 1
+#        folder: 'mimir'
+#        type: file
+#        disableDeletion: false
+#        allowUiUpdates: false
+#        updateIntervalSeconds: 30
+#        options:
+#          foldersFromFilesStructure: false
+#          path: /var/lib/grafana/dashboards/mimir
+#      - name: kubernetes
+#        orgId: 1
+#        folder: 'kubernetes'
+#        type: file
+#        disableDeletion: false
+#        allowUiUpdates: false
+#        updateIntervalSeconds: 30
+#        options:
+#          foldersFromFilesStructure: false
+#          path: /var/lib/grafana/dashboards/kubernetes
+#      - name: node-exporter
+#        orgId: 1
+#        folder: 'node-exporter'
+#        type: file
+#        disableDeletion: false
+#        allowUiUpdates: false
+#        updateIntervalSeconds: 30
+#        options:
+#          foldersFromFilesStructure: false
+#          path: /var/lib/grafana/dashboards/node-exporter
   securityContext:
     runAsUser: 0
     runAsGroup: 0
@@ -746,7 +762,7 @@ grafana:
     fsGroup: 0
 
 rollout_operator:
-  enabled: true
+  enabled: false
   nodeSelector:
     schedule.enabled/mimir: ''
   podSecurityContext: ~

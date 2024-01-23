@@ -700,7 +700,7 @@ build-binary: clean-binary
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o .wd/docker/mimir-linux-amd64 ./cmd/mimir
 	#CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -gcflags="all=-N -l" -o .wd/docker/mimir-linux-amd64 ./cmd/mimir
 
-imageRepo?=hub.17usoft.com/lhhdz/grafana/mimir:2.11_pre
+imageRepo?=hub.17usoft.com/lhhdz/grafana/mimir:release_2.11
 docker-image-build: build-binary
 	cd .wd/docker && docker build --platform=linux/amd64 -t $(imageRepo) -f Dockerfile .
 
