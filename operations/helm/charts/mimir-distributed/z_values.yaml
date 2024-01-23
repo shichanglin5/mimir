@@ -158,6 +158,8 @@ runtimeConfig:
 
 distributor:
   replicas: 8
+  nodeSelector:
+    schedule.enabled/mimir: ''
   topologySpreadConstraints:
     maxSkew: 1
     topologyKey: kubernetes.io/hostname
@@ -185,6 +187,8 @@ distributor:
 
 ingester:
   replicas: 8
+  nodeSelector:
+    schedule.enabled/mimir: ''
   statefulSet:
     enabled: true
   persistentVolume:
@@ -229,6 +233,8 @@ ingester:
 
 overrides_exporter:
   enabled: true
+  nodeSelector:
+    schedule.enabled/mimir: ''
   replicas: 1
   securityContext:
     fsGroup: ~
@@ -247,6 +253,8 @@ overrides_exporter:
 
 ruler:
   enabled: true
+  nodeSelector:
+    schedule.enabled/mimir: ''
   replicas: 0
   securityContext:
     fsGroup: ~
@@ -265,6 +273,8 @@ ruler:
 
 querier:
   replicas: 8
+  nodeSelector:
+    schedule.enabled/mimir: ''
   topologySpreadConstraints:
     maxSkew: 1
     topologyKey: kubernetes.io/hostname
@@ -286,6 +296,8 @@ querier:
 
 query_frontend:
   replicas: 8
+  nodeSelector:
+    schedule.enabled/mimir: ''
   securityContext:
     fsGroup: ~
     runAsGroup: ~
@@ -303,6 +315,8 @@ query_frontend:
 
 query_scheduler:
   enabled: true
+  nodeSelector:
+    schedule.enabled/mimir: ''
   replicas: 2
   securityContext:
     fsGroup: ~
@@ -321,6 +335,8 @@ query_scheduler:
 
 store_gateway:
   replicas: 0
+  nodeSelector:
+    schedule.enabled/mimir: ''
   podDisruptionBudget:
     maxUnavailable: 1
   persistentVolume:
@@ -362,6 +378,8 @@ store_gateway:
 
 compactor:
   replicas: 0
+  nodeSelector:
+    schedule.enabled/mimir: ''
   persistentVolume:
     enabled: true
     storageClass: "mimir-compactor"
@@ -388,6 +406,8 @@ compactor:
 
 chunks-cache:
   enabled: true
+  nodeSelector:
+    schedule.enabled/mimir: ''
   replicas: 1
   resources:
     requests:
@@ -396,6 +416,8 @@ chunks-cache:
 
 index-cache:
   enabled: true
+  nodeSelector:
+    schedule.enabled/mimir: ''
   replicas: 1
   resources:
     requests:
@@ -404,6 +426,8 @@ index-cache:
 
 metadata-cache:
   enabled: true
+  nodeSelector:
+    schedule.enabled/mimir: ''
   replicas: 1
   resources:
     requests:
@@ -412,6 +436,8 @@ metadata-cache:
 
 results-cache:
   enabled: true
+  nodeSelector:
+    schedule.enabled/mimir: ''
   replicas: 1
   allocatedMemory: 1024
   resources:
@@ -478,9 +504,13 @@ metaMonitoring:
 grafana-agent-operator:
   containerSecurityContext: ~
   podSecurityContext: ~
+  nodeSelector:
+    schedule.enabled/mimir: ''
 
 nginx:
   enabled: true
+  nodeSelector:
+    schedule.enabled/mimir: ''
   replicas: 1
   verboseLogging: true
   image:
@@ -642,6 +672,8 @@ nginx:
 
 grafana:
   enabled: true
+  nodeSelector:
+    schedule.enabled/mimir: ''
   image:
     registry:  hub.17usoft.com
     repository: lhhdz/grafana/grafana
@@ -715,6 +747,8 @@ grafana:
 
 rollout_operator:
   enabled: true
+  nodeSelector:
+    schedule.enabled/mimir: ''
   podSecurityContext: ~
   securityContext: ~
 enterprise:
