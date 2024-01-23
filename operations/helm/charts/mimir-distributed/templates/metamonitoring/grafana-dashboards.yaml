@@ -1,7 +1,8 @@
 {{- $currentScope := .Values.metaMonitoring.dashboards }}
 {{- if $currentScope.enabled }}
-{{ range $path, $_ :=  $.Files.Glob  "mixins/dashboards/*.json" }}
+{{ range $path, $_ :=  $.Files.Glob  "mixins/dashboards/**/*.json" }}
 {{ $file := $path | base }}
+{{ $folder := $path | dir | base }}
 {{ $name := print ($file | trimSuffix ".json")  "-dashboard" }}
 {{- with $currentScope}}
 apiVersion: v1
@@ -14,10 +15,8 @@ metadata:
     {{- with .labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- with .annotations }}
   annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    k8s-sidecar-target-directory: {{ $folder }}
 data:
   {{ $file }}: |-
 {{- $fileData := $.Files.Get $path | fromJson | merge (dict "timezone" "default") | toJson | indent 4 }}

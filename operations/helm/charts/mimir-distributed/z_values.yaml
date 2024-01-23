@@ -452,8 +452,9 @@ results-cache:
 metaMonitoring:
   dashboards:
     enabled: true
-    annotations:
-      k8s-sidecar-target-directory: 'Mimir Dashboards' # 如果这里用绝对路径，会导致 sidecar 将文件保存到绝对路径，会导致grafana读取不到dashboard；如果相对路径，会拼接到 /tmp/dashboards/ 下
+# 基于 dashboard 目录结构生成
+#    annotations:
+#      k8s-sidecar-target-directory: 'Mimir Dashboards' # 如果这里用绝对路径，会导致 sidecar 将文件保存到绝对路径，会导致grafana读取不到dashboard；如果相对路径，会拼接到 /tmp/dashboards/ 下
     labels:
       grafana_dashboard: "1"
   serviceMonitor:
