@@ -697,8 +697,8 @@ clean-binary:
 	rm -rf .wd/docker/mimir-linux-amd64
 
 build-binary: clean-binary
-	#CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o .wd/docker/mimir-linux-amd64 ./cmd/mimir
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -gcflags="all=-N -l" -o .wd/docker/mimir-linux-amd64 ./cmd/mimir
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o .wd/docker/mimir-linux-amd64 ./cmd/mimir
+	#CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -gcflags="all=-N -l" -o .wd/docker/mimir-linux-amd64 ./cmd/mimir
 
 imageRepo?=hub.17usoft.com/lhhdz/grafana/mimir:2.11_pre
 docker-image-build: build-binary
