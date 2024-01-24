@@ -22,143 +22,178 @@ serviceAccount:
   create: true
 configStorageType: ConfigMap
 runtimeConfig:
-  ingester_limits:
-    max_inflight_push_requests: 200000000
-    max_series: 200000000
-    max_tenants: 50
-    max_ingestion_rate: 200000000
   distributor_limits:
-    max_ingestion_rate: 200000000
     max_inflight_push_requests: 200000000
     max_inflight_push_requests_bytes: 10000000000
+    max_ingestion_rate: 200000000
+  ingester_limits:
+    max_inflight_push_requests: 200000000
+    max_ingestion_rate: 200000000
+    max_series: 200000000
+    max_tenants: 50
   overrides:
     anonymous:
-      request_rate: 100
+      ingestion_burst_size: 6000000
+      ingestion_rate: 3000000
+      max_cache_freshness: 12m
+      max_global_series_per_metric: 200000000
+      max_global_series_per_user: 200000000
+      out_of_order_time_window: 10m
       request_burst_size: 200
-      ingestion_rate: 3000000
-      ingestion_burst_size: 6000000
-      max_global_series_per_user: 200000000
-      max_global_series_per_metric: 200000000
-      out_of_order_time_window: 10m
+      request_rate: 100
+    default:
+      ingestion_burst_size: 2000000
+      ingestion_rate: 2000000
       max_cache_freshness: 12m
-    mimir:
+      max_global_series_per_metric: 40000000
+      max_global_series_per_user: 40000000
+      out_of_order_time_window: 10m
+      request_burst_size: 5000
+      request_rate: 5000
+      max_label_name_length: 150
+      max_label_value_length: 200
+    inf-dbproxy:
+      ingestion_burst_size: 2500000
+      ingestion_rate: 2000000
+      max_cache_freshness: 12m
+      max_global_series_per_metric: 20000000
+      max_global_series_per_user: 20000000
+      out_of_order_time_window: 10m
+      request_burst_size: 3000
+      request_rate: 2000
+      max_label_name_length: 150
+      max_label_value_length: 150
+    inf-es:
+      ingestion_burst_size: 1
+      ingestion_rate: 1
+      max_cache_freshness: 12m
+      max_global_series_per_metric: 1
+      max_global_series_per_user: 1
+      out_of_order_time_window: 10m
+      request_rate: 1
+      max_label_name_length: 150
+      max_label_value_length: 150
+    inf-esproxy:
+      ingestion_burst_size: 5000000
+      ingestion_rate: 4000000
+      max_cache_freshness: 12m
+      max_global_series_per_metric: 15000000
+      max_global_series_per_user: 15000000
+      out_of_order_time_window: 10m
+      request_burst_size: 5000
+      request_rate: 4000
+      max_label_name_length: 150
+      max_label_value_length: 200
+    inf-redisproxy:
+      ingestion_burst_size: 600000
+      ingestion_rate: 500000
+      max_cache_freshness: 12m
+      max_global_series_per_metric: 2000000
+      max_global_series_per_user: 2000000
+      out_of_order_time_window: 10m
+      request_burst_size: 1000
       request_rate: 1000
-      request_burst_size: 2000
-      ingestion_rate: 3000000
-      ingestion_burst_size: 6000000
-      max_global_series_per_user: 200000000
-      max_global_series_per_metric: 200000000
-      out_of_order_time_window: 10m
+      max_label_name_length: 150
+      max_label_value_length: 150
+    inf-pay:
+      ingestion_burst_size: 1000000
+      ingestion_rate: 800000
       max_cache_freshness: 12m
+      max_global_series_per_metric: 5000000
+      max_global_series_per_user: 5000000
+      out_of_order_time_window: 10m
+      request_burst_size: 1000
+      request_rate: 1000
+      max_label_name_length: 150
+      max_label_value_length: 180
+    mimir:
+      ingestion_burst_size: 6000000
+      ingestion_rate: 3000000
+      max_cache_freshness: 12m
+      max_global_series_per_metric: 200000000
+      max_global_series_per_user: 200000000
       max_label_name_length: 200
       max_label_value_length: 200
-    default:
-      request_rate: 5000
-      request_burst_size: 5000
-      ingestion_rate: 2000000
-      ingestion_burst_size: 2000000
-      max_global_series_per_user: 15000000
-      max_global_series_per_metric: 15000000
       out_of_order_time_window: 10m
-      max_cache_freshness: 12m
-    skyeye-tlb:
-      request_rate: 10000
-      request_burst_size: 14000
-      ingestion_rate: 500000
-      ingestion_burst_size: 800000
-      max_global_series_per_user: 15000000
-      max_global_series_per_metric: 15000000
-      out_of_order_time_window: 10m
-      max_cache_freshness: 20m
-    skyeye-tlb-uat:
+      request_burst_size: 2000
       request_rate: 1000
-      request_burst_size: 1500
-      ingestion_rate: 50000
-      ingestion_burst_size: 500000
-      max_global_series_per_user: 500000
-      max_global_series_per_metric: 500000
-      out_of_order_time_window: 10m
-      max_cache_freshness: 12m
-    skyeye-skynet:
-      request_rate: 1000
-      request_burst_size: 1500
-      ingestion_rate: 90000
-      ingestion_burst_size: 100000
-      max_global_series_per_user: 400000
-      max_global_series_per_metric: 400000
-      out_of_order_time_window: 10m
-      max_cache_freshness: 12m
-    skyeye-apm:
-      request_rate: 60000
-      request_burst_size: 70000
-      ingestion_rate: 3000000
-      ingestion_burst_size: 4000000
-      max_global_series_per_user: 120000000
-      max_global_series_per_metric: 120000000
-      out_of_order_time_window: 10m
-      max_cache_freshness: 12m
-    skyeye-apm-uat:
-      request_rate: 10000
-      request_burst_size: 15000
-      ingestion_rate: 500000
-      ingestion_burst_size: 600000
-      max_global_series_per_user: 3000000
-      max_global_series_per_metric: 3000000
-      out_of_order_time_window: 10m
-      max_cache_freshness: 12m
-    inf-redisproxy:
-      request_rate: 1000
-      request_burst_size: 1000
-      ingestion_rate: 500000
-      ingestion_burst_size: 600000
-      max_global_series_per_user: 2000000
-      max_global_series_per_metric: 2000000
-      out_of_order_time_window: 10m
-      max_cache_freshness: 12m
-    inf-dbproxy:
-      request_rate: 2000
-      request_burst_size: 3000
-      ingestion_rate: 2000000
-      ingestion_burst_size: 2500000
-      max_global_series_per_user: 20000000
-      max_global_series_per_metric: 20000000
-      out_of_order_time_window: 10m
-      max_cache_freshness: 12m
-    inf-esproxy:
-      request_rate: 4000
-      request_burst_size: 5000
-      ingestion_rate: 4000000
-      ingestion_burst_size: 5000000
-      max_global_series_per_user: 15000000
-      max_global_series_per_metric: 15000000
-      out_of_order_time_window: 10m
-      max_cache_freshness: 12m
-    inf-es:
-      request_rate: 1
-      ingestion_rate: 1
-      ingestion_burst_size: 1
-      max_global_series_per_user: 1
-      max_global_series_per_metric: 1
-      out_of_order_time_window: 10m
-      max_cache_freshness: 12m
-    skyeye-gateway:
-      request_rate: 5000
-      request_burst_size: 5000
-      ingestion_rate: 400000
-      ingestion_burst_size: 400000
-      max_global_series_per_user: 1800000
-      max_global_series_per_metric: 1800000
-      out_of_order_time_window: 10m
-      max_cache_freshness: 12m
     skyeye-alert:
-      request_rate: 100
-      request_burst_size: 200
-      ingestion_rate: 500
       ingestion_burst_size: 100
-      max_global_series_per_user: 10000
-      max_global_series_per_metric: 10000
-      out_of_order_time_window: 10m
+      ingestion_rate: 500
       max_cache_freshness: 12m
+      max_global_series_per_metric: 10000
+      max_global_series_per_user: 10000
+      out_of_order_time_window: 10m
+      request_burst_size: 200
+      request_rate: 100
+      max_label_name_length: 150
+      max_label_value_length: 150
+    skyeye-apm:
+      ingestion_burst_size: 4000000
+      ingestion_rate: 3000000
+      max_cache_freshness: 12m
+      max_global_series_per_metric: 120000000
+      max_global_series_per_user: 120000000
+      out_of_order_time_window: 10m
+      request_burst_size: 70000
+      request_rate: 60000
+      max_label_name_length: 150
+      max_label_value_length: 150
+    skyeye-apm-uat:
+      ingestion_burst_size: 600000
+      ingestion_rate: 500000
+      max_cache_freshness: 12m
+      max_global_series_per_metric: 3000000
+      max_global_series_per_user: 3000000
+      out_of_order_time_window: 10m
+      request_burst_size: 15000
+      request_rate: 10000
+      max_label_name_length: 150
+      max_label_value_length: 150
+    skyeye-gateway:
+      ingestion_burst_size: 400000
+      ingestion_rate: 400000
+      max_cache_freshness: 12m
+      max_global_series_per_metric: 1800000
+      max_global_series_per_user: 1800000
+      out_of_order_time_window: 10m
+      request_burst_size: 5000
+      request_rate: 5000
+      max_label_name_length: 150
+      max_label_value_length: 150
+    skyeye-skynet:
+      ingestion_burst_size: 100000
+      ingestion_rate: 90000
+      max_cache_freshness: 12m
+      max_global_series_per_metric: 400000
+      max_global_series_per_user: 400000
+      out_of_order_time_window: 10m
+      request_burst_size: 1500
+      request_rate: 1000
+      max_label_name_length: 150
+      max_label_value_length: 150
+    skyeye-tlb:
+      ingestion_burst_size: 800000
+      ingestion_rate: 500000
+      max_cache_freshness: 20m
+      max_global_series_per_metric: 15000000
+      max_global_series_per_user: 15000000
+      out_of_order_time_window: 10m
+      request_burst_size: 14000
+      request_rate: 10000
+      max_label_name_length: 150
+      max_label_value_length: 150
+    skyeye-tlb-uat:
+      ingestion_burst_size: 500000
+      ingestion_rate: 50000
+      max_cache_freshness: 12m
+      max_global_series_per_metric: 500000
+      max_global_series_per_user: 500000
+      out_of_order_time_window: 10m
+      request_burst_size: 1500
+      request_rate: 1000
+      max_label_name_length: 150
+      max_label_value_length: 150
 
 distributor:
   replicas: 8
