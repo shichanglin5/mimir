@@ -550,11 +550,12 @@ nginx:
     schedule.enabled/mimir: ''
   replicas: 1
   securityContext:
-    fsGroup: ~
+    fsGroup: 0
     runAsGroup: ~
     runAsNonRoot: ~
     runAsUser: 0
     seccompProfile: ~
+  containerSecurityContext: ~
   verboseLogging: true
   image:
     registry: docker.io
@@ -614,6 +615,7 @@ nginx:
         {{- else }}
         resolver {{ .Values.global.dnsService }}.{{ .Values.global.dnsNamespace }}.svc.{{ .Values.global.clusterDomain }};
         {{- end }}
+        resolver_timeout: 3
 
         {{- with .Values.nginx.nginxConfig.httpSnippet }}
         {{ . | nindent 2 }}
